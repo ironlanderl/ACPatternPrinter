@@ -10,9 +10,9 @@ namespace ACPatternPrint
         static public int position = 0;
         public static Socket Connection = new Socket(SocketType.Stream, ProtocolType.Tcp);
 
-        private static void colora(char a)
+        private static void SelectColor(char color)
         {
-            switch (a)
+            switch (color)
             {
                 case '0':
                     while (position < 0)
@@ -239,7 +239,7 @@ namespace ACPatternPrint
                     break;
 
                 default:
-                    Console.WriteLine(a + " Garbage Data Detected ");
+                    Console.WriteLine(color + "\tERROR");
                     break;
             }
         }
@@ -262,7 +262,6 @@ namespace ACPatternPrint
             char[,] pattern2;
             string hex = "";
             string ip;
-            bool connected = false;
             //ask for switch ip
             Console.Write("IP: ");
             ip = Console.ReadLine();
@@ -274,26 +273,26 @@ namespace ACPatternPrint
             }
             //remove non pattern data
             hex = hex.Substring(216);
-            int lunghezzastringa = hex.Length;
-            pattern = new char[hex.Length];
+            int stringLenght = hex.Length;
+            pattern = new char[stringLenght];
             pattern = hex.ToCharArray();
 
-            // invert hex hex order, becouse acpattern has them inverted
-            for (int i = 0; i < lunghezzastringa - 3; i += 2)
+            // invert hex order
+            for (int i = 0; i < stringLenght - 3; i += 2)
             {
                 char tmp;
                 tmp = pattern[i];
                 pattern[i] = pattern[i + 1];
                 pattern[i + 1] = tmp;
             }
-            int dimanesions = 32;
-            pattern2 = new char[dimanesions, dimanesions];
+            const int patternDimension = 32;
+            pattern2 = new char[patternDimension, patternDimension];
             int tot = 0;
 
             //divide it in a 32*32 matrix
-            for (int i = 0; i < dimanesions; i++)
+            for (int i = 0; i < patternDimension; i++)
             {
-                for (int j = 0; j < dimanesions; j++)
+                for (int j = 0; j < patternDimension; j++)
                 {
                     pattern2[i, j] = pattern[tot];
                     tot++;
@@ -301,14 +300,14 @@ namespace ACPatternPrint
             }
 
             //invert every second line for faster printing
-            for (int i = 1; i < dimanesions; i += 2)
+            for (int i = 1; i < patternDimension; i += 2)
             {
-                for (int j = 0; j < dimanesions / 2; j++)
+                for (int j = 0; j < patternDimension / 2; j++)
                 {
                     char tmp;
                     tmp = pattern2[i, j];
-                    pattern2[i, j] = pattern2[i, dimanesions - j - 1];
-                    pattern2[i, dimanesions - j - 1] = tmp;
+                    pattern2[i, j] = pattern2[i, patternDimension - j - 1];
+                    pattern2[i, patternDimension - j - 1] = tmp;
                 }
             }
 
@@ -327,19 +326,19 @@ namespace ACPatternPrint
             }
             //print if connected, else exit
 
-                for (int i = 0; i < dimanesions; i++)
+                for (int i = 0; i < patternDimension; i++)
                 {
-                    for (int j = 0; j < dimanesions; j++)
+                    for (int j = 0; j < patternDimension; j++)
                     {
-                        colora(pattern2[i, j]);
+                        SelectColor(pattern2[i, j]);
                         Connection.Send(Encoding.ASCII.GetBytes("click DRIGHT" + '\n' + '\r'));
                         System.Threading.Thread.Sleep(250);
                     }
                     Connection.Send(Encoding.ASCII.GetBytes("click DDOWN" + '\n' + '\r'));
                     i++;
-                    for (int j = 0; j < dimanesions; j++)
+                    for (int j = 0; j < patternDimension; j++)
                     {
-                        colora(pattern2[i, j]);
+                        SelectColor(pattern2[i, j]);
                         Connection.Send(Encoding.ASCII.GetBytes("click DLEFT" + '\n' + '\r'));
                         System.Threading.Thread.Sleep(250);
                     }
